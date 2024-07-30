@@ -4,6 +4,7 @@ import { Map } from 'react-map-gl';
 import { ScatterplotLayer } from '@deck.gl/layers';
 import * as XLSX from 'xlsx';
 import './DetailedMap.css'; // Import the CSS file
+import InfoPanel from './InfoPanel'; // Import the InfoPanel component
 
 const INITIAL_VIEW_STATE = {
   longitude: -95.7129,
@@ -16,6 +17,7 @@ const INITIAL_VIEW_STATE = {
 const DetailedMap = () => {
   const [data, setData] = useState([]);
   const [hoverInfo, setHoverInfo] = useState(null);
+  const [selectedScale, setSelectedScale] = useState('default');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,36 +48,54 @@ const DetailedMap = () => {
   }, []);
 
   const getColor = (value) => {
-    if (value < 20) return [234, 53, 70];       // Dark Red
-    if (value < 25) return [255, 126, 54];     // Indian Red
-    if (value < 30) return [248, 185, 32];    // Peru
-    if (value < 35) return [238, 235, 32];     // Dark Orange
-    if (value < 40) return [145, 205, 150];    // Golden Rod
-    if (value < 45) return [78, 205, 196];     // Olive
-    return [49, 130, 189];                     // Dark Green
+    // console.log('selectedScale:', selectedScale);
+    if (selectedScale === 'default') {
+      if (value < 20) return [234, 53, 70];       // Dark Red
+      if (value < 25) return [255, 126, 54];      // Indian Red
+      if (value < 30) return [248, 185, 32];      // Peru
+      if (value < 35) return [238, 235, 32];      // Dark Orange
+      if (value < 40) return [145, 205, 150];     // Golden Rod
+      if (value < 45) return [78, 205, 196];      // Olive
+      return [49, 130, 189];                      // Dark Green
+    } else {
+      if (value < 20) return [255, 0, 0];         // Red
+      if (value < 25) return [255, 145, 0];       // Orange
+      if (value < 30) return [255, 215, 0];       // Yellow
+      if (value < 35) return [0, 158, 0];         // Green
+      if (value < 40) return [0, 100, 255];         // Blue
+      if (value < 45) return [128, 0, 128];       // Purple
+      return [128, 128, 128];                     // Grey
+    }
   };
 
-  const layers = [
-    new ScatterplotLayer({
-      id: 'scatterplot-layer',
-      data,
-      getPosition: d => d.position,
-      getFillColor: d => getColor(d.value),
-      getRadius: d => 20000,
-      radiusScale: 1,
-      getLineColor: [0, 0, 0, 255],
-      lineWidthMinPixels: 2, // Set the stroke width
-      pickable: true,
-      onHover: info => setHoverInfo(info)
-    })
-  ];
+  const renderLayers = () => {
+    return [
+      new ScatterplotLayer({
+        id: 'scatterplot-layer',
+        data,
+        getPosition: d => d.position,
+        getFillColor: d => {
+          const color = getColor(d.value);
+        //   console.log('Data point color:', color);
+          return color;
+        },
+        getRadius: d => 20000,
+        radiusScale: 1,
+        getLineColor: [0, 0, 0, 255],
+        lineWidthMinPixels: 2, // Set the stroke width
+        pickable: true,
+        onHover: info => setHoverInfo(info)
+      })
+    ];
+  };
 
   return (
     <div>
       <DeckGL
+        key={selectedScale}  // Use key to force re-render
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
-        layers={layers}
+        layers={renderLayers()}
         style={{ width: '100%', height: '100%' }}
       >
         <Map
@@ -106,6 +126,7 @@ const DetailedMap = () => {
           <div><strong>DCI Score:</strong> {hoverInfo.object.dciScore}</div>
         </div>
       )}
+      <InfoPanel selectedScale={selectedScale} setSelectedScale={setSelectedScale} />
     </div>
   );
 };
