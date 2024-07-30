@@ -7,7 +7,7 @@
     border-radius: 4px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     z-index: 1000;
-    max-width: 300px;
+    max-width: 400px;
     opacity: 0.9; /* Set opacity to 0.9 */
   }
   
@@ -18,7 +18,7 @@
   .legend-item {
     display: flex;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
   }
   
   .color-box {
@@ -33,6 +33,22 @@
   }
   
   .radio-group input[type="radio"] {
-    margin-bottom: 20px; /* Add margin to create a 20px gap */
+    margin-bottom: 5px; /* Add margin to create a 10px gap */
+  }
+  
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0px;
+  }
+  
+  .checkbox-group label {
+    margin-bottom: 5px;
+  }
+  
+  .legend-item label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
   }
   
